@@ -1,0 +1,16 @@
+PoE
+- Pong
+    - 2 Player input that control a paddle each
+        - Constraints
+    - A ball that bounces between paddles
+    - Goal-detection
+    - Score-Keeping
+    - Win-con
+    
+- Optional
+    - A menu screen
+    - Sounds
+    - Extra VFX
+    - CPU play
+    - Difficulty increases
+    
