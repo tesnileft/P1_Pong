@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Microsoft.Xna.Framework;
+using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 
 namespace TestLib.Helper
@@ -25,9 +26,14 @@ namespace TestLib.Helper
             var m = v - c;
             return new Color(rgb1.X + m, rgb1.Y + m, rgb1.Z + m);
         }
-        public static Point VecToPoint(this System.Numerics.Vector2 vec, float scale = 1)
+        public static Point VecToPoint(this Microsoft.Xna.Framework.Vector2 vec, float scale = 1)
         {
             return new Point((int)(vec.X * scale), (int)(vec.Y * scale));
+        }
+
+        public static Vector2 PointToVec2(this Microsoft.Xna.Framework.Point vec, float scale = 1)
+        {
+            return new Vector2(vec .X * scale, vec.Y * scale);
         }
     }
     
