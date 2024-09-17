@@ -16,8 +16,8 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     private float backgroundhue = 0;    
     private Texture2D playButtonTex;
-    private Ui menuScreen;
-    private Ui gameScreen;
+    private Scene menuScreen;
+    private Scene gameScreen;
     private MouseState mousePrev;
     private EventHandler mouseClick;
     
@@ -39,13 +39,14 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         playButtonTex = Content.Load<Texture2D>(@"Play");
-        Ui.Button[] buttons = new Ui.Button[1];
-        buttons[0] = new Ui.Button(
+        UI.Button[] buttons = new UI.Button[1];
+        buttons[0] = new UI.Button(
             new Vector2(Window.ClientBounds.Width/2-50, 0) ,
             new Vector2(100), 
-            playButtonTex, 
+            playButtonTex,
             Content.Load<Texture2D>(@"Highlight")
             );
+        buttons[0].ButtonDown += (obj, args) => {Console.WriteLine("Main menu button clicked");};
         menuScreen = new MenuScreen(buttons, Content.Load<Texture2D>(@"Highlight"));
     }
 
@@ -57,7 +58,8 @@ public class Game1 : Game
         
         if(mousePrev.LeftButton == ButtonState.Released && Mouse.GetState().LeftButton == ButtonState.Pressed )
         {
-           mouseClick?.Invoke(this, EventArgs.Empty); 
+           mouseClick?.Invoke(this, EventArgs.Empty);
+           
         }
         mousePrev = Mouse.GetState();
         

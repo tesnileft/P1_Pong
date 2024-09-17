@@ -4,9 +4,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
+using P1_Pong;
 using TestLib.Helper;
 
-public class GameScreen : Ui
+public class GameScreen : Scene
 {
     ContentManager _content;
     Game _game;
@@ -26,14 +27,14 @@ public class GameScreen : Ui
     }
     public void Initialize()
     {
-        
+        new Paddle();
     }
     
     public override void Draw(SpriteBatch spriteBatch)
     {
         
     }
-    public virtual void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
     {
         
     
@@ -45,8 +46,13 @@ public class GameScreen : Ui
     }
     
 }
-public class Ui
+public class Scene
 {
+    HashSet<GameObject> _objects;
+    public virtual void Init()
+    {
+        //Load all your stuff here
+    }
     public virtual void Draw(SpriteBatch spriteBatch)
     {
 
@@ -57,18 +63,81 @@ public class Ui
 
 
     }
+}
 
+public class MenuScreen : Scene
+{
+        private UI homeUI;
+        private List<CpuParticleManager> _particles;
+        
+        void Init(Texture2D texture)
+        {
+            _particles = new List<CpuParticleManager>();
+            _particles.Add(new CpuParticleManager(texture));
+        }
+
+        public MenuScreen(UI.Button[] buttons, Texture2D tex)
+        {
+            homeUI = new (buttons);
+            Init(tex);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            homeUI.Draw(spriteBatch);
+            
+            foreach (var particleSystem in _particles)
+            {
+                particleSystem.Draw(spriteBatch);
+            }
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            homeUI.Update(gameTime);
+                
+            foreach (CpuParticleManager manager in _particles)
+            {
+                manager.Update(gameTime);
+            }
+        }
+    }
+
+public class UI
+{
+    private Button[] _buttons;
+
+    public UI(Button[] buttons)
+    {
+        _buttons = buttons;
+    }
+    public void Update(GameTime gameTime)
+    {
+        foreach (Button b in _buttons)
+        {
+            b.Update();
+        }
+    }
+
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        foreach (Button b in _buttons)
+        {
+            b.Draw(spriteBatch);
+        }
+    }
     public class Button
     {
-        bool _buttonHover = false;
-        private bool _clicked = false;
+        bool _buttonHover;
+        private bool _clicked;
         private bool _buttonClickable = true;
+        private string _textureName;
         Texture2D _buttonTexture;
-        Texture2D _highlightTexture = null;
+        Texture2D _highlightTexture;
         MouseState _mousePrev = Mouse.GetState();
         Point _position;
         Point _size;
-        public event EventHandler ButtonClicked;
+        public event EventHandler ButtonDown;
         
         public Button(Vector2 positionV, Vector2 sizeV, Texture2D texture, Texture2D highlightTexture) : this(positionV,
             sizeV, texture)
@@ -91,15 +160,20 @@ public class Ui
             _buttonTexture = texture;
         }
 
+        public void Load(Game game)
+        {
+            _buttonTexture = game.Content.Load<Texture2D>(_textureName);
+        }
+
         public void Update()
         {
-            // CheckHover(Mouse.GetState().Position);
+            CheckHover(Mouse.GetState().Position);
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && _mousePrev.LeftButton == ButtonState.Released && _buttonClickable)
             {
-                //Yay button got clicked
-                ButtonClicked?.Invoke(this, EventArgs.Empty);
+                //Yay! button got clicked
+                ButtonDown?.Invoke(this, EventArgs.Empty);
             }
-            
+            _mousePrev = Mouse.GetState();
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -128,52 +202,3 @@ public class Ui
         }
     }
 }
-
-public class MenuScreen : Ui
-    {
-        private Button[] _buttons;
-        private List<CpuParticleManager> _particles;
-        MouseState _prevMouse;
-        public MenuScreen(Texture2D texture)
-        {
-            _buttons = new Button[1];
-            _buttons[0] = new Button(Vector2.Zero, new Vector2(40, 40), texture, null);
-            _particles = new List<CpuParticleManager>();
-            _particles.Add(new CpuParticleManager(texture));
-        }
-
-        public MenuScreen(Button[] buttons, Texture2D tex)
-        {
-            _buttons = buttons;
-            _particles = new List<CpuParticleManager>();
-            _particles.Add(new CpuParticleManager(tex));
-            
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            foreach (var particleSystem in _particles)
-            {
-                particleSystem.Draw(spriteBatch);
-            }
-            foreach (Button b in _buttons)
-            {
-                b.Draw(spriteBatch);
-            }
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            foreach (Button b in _buttons)
-            {
-                b.Update();
-            }
-
-            foreach (CpuParticleManager manager in _particles)
-            {
-                manager.Update(gameTime);
-            }
-
-            
-        }
-    }
