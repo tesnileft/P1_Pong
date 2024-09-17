@@ -168,7 +168,7 @@ public class UI
         public void Update()
         {
             CheckHover(Mouse.GetState().Position);
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && _mousePrev.LeftButton == ButtonState.Released && _buttonClickable)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && _mousePrev.LeftButton == ButtonState.Released && _buttonClickable && _buttonHover)
             {
                 //Yay! button got clicked
                 ButtonDown?.Invoke(this, EventArgs.Empty);
