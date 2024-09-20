@@ -18,6 +18,7 @@ public class Game1 : Game
     private Texture2D playButtonTex;
     private Scene menuScreen;
     private Scene gameScreen;
+    private Scene currentScene;
     private MouseState mousePrev;
     private EventHandler mouseClick;
     
@@ -26,6 +27,7 @@ public class Game1 : Game
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+        Window.AllowUserResizing = false;
     }
 
     protected override void Initialize()
@@ -46,8 +48,14 @@ public class Game1 : Game
             playButtonTex,
             Content.Load<Texture2D>(@"Highlight")
             );
-        buttons[0].ButtonDown += (obj, args) => {Console.WriteLine("Main menu button clicked");};
+        buttons[0].ButtonDown += (obj, args) =>
+        {
+            Console.WriteLine("Main menu button clicked");
+            currentScene = new GameScreen(this);
+            
+        };
         menuScreen = new MenuScreen(buttons, Content.Load<Texture2D>(@"Highlight"));
+        currentScene = menuScreen;
     }
 
     protected override void Update(GameTime gameTime)
@@ -56,16 +64,11 @@ public class Game1 : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
         
-        if(mousePrev.LeftButton == ButtonState.Released && Mouse.GetState().LeftButton == ButtonState.Pressed )
-        {
-           mouseClick?.Invoke(this, EventArgs.Empty);
-           
-        }
-        mousePrev = Mouse.GetState();
+        currentScene.Update(gameTime);
         
-        menuScreen.Update(gameTime);
-        // TODO: Add your update logic here
+        //This does nothing anymore 
         backgroundhue = (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds) / 2 + 0.5f;
+        
         base.Update(gameTime);
     }
 
@@ -74,8 +77,9 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.Black);
         
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        menuScreen.Draw(_spriteBatch);
+        currentScene.Draw(_spriteBatch);
         _spriteBatch.End();
+        
         base.Draw(gameTime);
     }
 }
