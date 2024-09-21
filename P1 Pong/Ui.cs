@@ -136,8 +136,36 @@ public class GameScreen : Scene
         {
             if (ballRect.Intersects(p.Rect))
             {
-                //Do angle based on where center is?
-                ballDir.X *= -1;
+                //Do collision!!
+                //If it hits the top, should bounce back up, and invert x direction
+                Vector2 ballCenter = ballRect.Center.ToVector2();
+                Vector2 paddleCenter = p.Rect.Center.ToVector2();
+                
+                
+                // Normal (vertical paddle) is 0
+                double angleBall = p.Axis ? 1 : Math.Atan(  double.Abs(ballCenter.Y - paddleCenter.Y) / double.Abs(ballCenter.X - paddleCenter.X)) * 180 / Math.PI;
+                
+                double paddleX = Double.Abs(paddleCenter.X - p.Rect.Location.X);
+                double paddleY = Double.Abs(paddleCenter.Y - p.Rect.Location.Y);
+                
+                double paddleAngle = Math.Atan(paddleY/paddleX) * 180 / Math.PI;
+                
+                Console.WriteLine($"Collision!!");
+                Console.WriteLine($"Paddle corner angle: {paddleAngle}");
+                Console.WriteLine($"Ball impact angle: {angleBall}");
+                
+                if (angleBall > paddleAngle)
+                {
+                    //Change direction
+                    ballDir.Y *= -1;
+                    ballDir.X *= -1;
+                    //TODO get the ball out of the paddle
+                }
+                else
+                {
+                    ballDir.X *= -1;
+                }
+                
             }
             
         }
@@ -190,7 +218,7 @@ public class GameScreen : Scene
         private Keys _leftkey;
         private Keys _rightkey;
         
-        private bool _axis;
+        public bool Axis;
         
 
         public Paddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, Keys left, Keys right, bool onXaxis = false)
@@ -198,7 +226,7 @@ public class GameScreen : Scene
             _parent = parent;
             Rect = new(pos.ToPoint(), size.ToPoint());
             _sprite = sprite;
-            _axis = onXaxis;
+            Axis = onXaxis;
             _leftkey = left;
             _rightkey = right;
         }
@@ -213,7 +241,7 @@ public class GameScreen : Scene
             int movespeed = 5;
             if (Keyboard.GetState().IsKeyDown(_leftkey))
             {
-                if (!_axis)
+                if (!Axis)
                 {
                     Rect.Y -= movespeed;
                 }
@@ -226,7 +254,7 @@ public class GameScreen : Scene
             
             if (Keyboard.GetState().IsKeyDown(_rightkey))
             {
-                if (!_axis)
+                if (!Axis)
                 {
                     Rect.Y += movespeed;
                 }
