@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -67,7 +68,7 @@ public class GameScreen : Scene
             this,
             _paddleTex,
             new Vector2(20, _game.Window.ClientBounds.Height/2 - 100/2),
-            new Vector2(10, 100),
+            new Vector2(10, 50),
             Keys.W,
             Keys.S
             );
@@ -110,7 +111,7 @@ public class GameScreen : Scene
             if (coundownMs <= 0)
             {
                 _countdown = false;
-                coundownMs = 3000;
+                coundownMs = 1000;
                 RandomizeBall();
             }
 
@@ -141,7 +142,6 @@ public class GameScreen : Scene
                 Vector2 ballCenter = ballRect.Center.ToVector2();
                 Vector2 paddleCenter = p.Rect.Center.ToVector2();
                 
-                
                 // Normal (vertical paddle) is 0
                 double angleBall = p.Axis ? 1 : Math.Atan(  double.Abs(ballCenter.Y - paddleCenter.Y) / double.Abs(ballCenter.X - paddleCenter.X)) * 180 / Math.PI;
                 
@@ -149,23 +149,26 @@ public class GameScreen : Scene
                 double paddleY = Double.Abs(paddleCenter.Y - p.Rect.Location.Y);
                 
                 double paddleAngle = Math.Atan(paddleY/paddleX) * 180 / Math.PI;
-                
+  
                 Console.WriteLine($"Collision!!");
                 Console.WriteLine($"Paddle corner angle: {paddleAngle}");
                 Console.WriteLine($"Ball impact angle: {angleBall}");
                 
+                Vector2 paddleDiff = paddleCenter - ballCenter;
+                //Naively reflect
                 if (angleBall > paddleAngle)
                 {
-                    //Change direction
-                    ballDir.Y *= -1;
+                    //Side reflect
+                    ballDir.Y *= (ballCenter.Y < paddleCenter.Y ? -1 : 1);
                     ballDir.X *= -1;
-                    //TODO get the ball out of the paddle
                 }
                 else
                 {
+                    //Front reflect
                     ballDir.X *= -1;
+                    ballDir.Y = (float)(angleBall / 80) * (paddleCenter.Y> ballCenter.Y ? -1 : 1);
+                    //Console.WriteLine($"Ball impact angle: {paddleCenter.Y > ballCenter.Y}");
                 }
-                
             }
             
         }
@@ -217,7 +220,8 @@ public class GameScreen : Scene
 
         private Keys _leftkey;
         private Keys _rightkey;
-        
+
+        private int _moveSpeed = 5;
         public bool Axis;
         
 
@@ -230,6 +234,7 @@ public class GameScreen : Scene
             _leftkey = left;
             _rightkey = right;
         }
+        
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(_sprite, Rect, Color.White);
@@ -238,16 +243,16 @@ public class GameScreen : Scene
         public void Update(GameTime gameTime, GameWindow window)
         {
             //Check keydowns
-            int movespeed = 5;
+           
             if (Keyboard.GetState().IsKeyDown(_leftkey))
             {
                 if (!Axis)
                 {
-                    Rect.Y -= movespeed;
+                    Rect.Y -= _moveSpeed;
                 }
                 else
                 {
-                    Rect.X += movespeed;
+                    Rect.X += _moveSpeed;
                 }
                     
             }
@@ -256,11 +261,11 @@ public class GameScreen : Scene
             {
                 if (!Axis)
                 {
-                    Rect.Y += movespeed;
+                    Rect.Y += _moveSpeed;
                 }
                 else
                 {
-                    Rect.X -= movespeed;
+                    Rect.X -= _moveSpeed;
                 }
             }
             //Constrain to playable space
@@ -277,6 +282,11 @@ public class GameScreen : Scene
             
 
 
+        }
+
+        void SetSpeed(int speed)
+        {
+            _moveSpeed = speed;
         }
     }
 }
