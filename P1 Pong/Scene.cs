@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
-
-using MonoGame.OpenGL;
 using P1_Pong;
 using TestLib.Helper;
 
@@ -20,13 +17,12 @@ public class Scene
     }
     public virtual void Draw(SpriteBatch spriteBatch)
     {
-
+        //Stuff gets drawn here
     }
 
     public virtual void Update(GameTime gameTime)
     {
-
-
+        //Stuff gets done here
     }
 }
 public class GameScreen : Scene
@@ -43,13 +39,11 @@ public class GameScreen : Scene
     private Rectangle ballRect;
     
     Paddle[] _paddles;
-    
 
     public GameScreen(Game game)
     {
         Content = game.Content;
         _game = game;
-        
         LoadContent();
     }
     public void LoadContent()
@@ -58,13 +52,13 @@ public class GameScreen : Scene
         //_paddleTex = Content.Load<Texture2D>("Paddle");
         _weede = Content.Load<Texture2D>("Weede");
         
-        //2 player game
-        //Temp textures
-        _paddleTex = _weede;
+        //For the 2 player game
+        _paddleTex = Content.Load<Texture2D>("Paddle_default");
+        //Temp texture
         _ballTex = _weede;
         
         _paddles = new Paddle[2];
-        _paddles[0] = new Paddle(
+        _paddles[0] = new PlayerPaddle(
             this,
             _paddleTex,
             new Vector2(20, _game.Window.ClientBounds.Height/2 - 100/2),
@@ -72,7 +66,7 @@ public class GameScreen : Scene
             Keys.W,
             Keys.S
             );
-        _paddles[1] = new Paddle(
+        _paddles[1] = new PlayerPaddle(
             this,
             _paddleTex,
             new Vector2(_game.Window.ClientBounds.Width - 20, _game.Window.ClientBounds.Height/2 - 100/2),
@@ -89,6 +83,7 @@ public class GameScreen : Scene
     {
         Rectangle fullscreenRect = new( new Point(0,0),new Point(_game.Window.ClientBounds.Width,_game.Window.ClientBounds.Height));
         //Fullscreen weede :sunglassesvery3dcool:
+        //I removed him he no longer is real :<
         // spriteBatch.Draw(_weede, fullscreenRect, Color.White);
     
         //Draw the paddles. Peddls. Pad els. 
@@ -98,13 +93,9 @@ public class GameScreen : Scene
         }
         //Draw ball 
         spriteBatch.Draw(_ballTex, ballRect, Color.White);
-        
-        
-        
     }
     public override void Update(GameTime gameTime)
     {
-        
         if (_countdown)
         {
             coundownMs -= gameTime.ElapsedGameTime.Milliseconds;
@@ -114,7 +105,6 @@ public class GameScreen : Scene
                 coundownMs = 3000;
                 RandomizeBall();
             }
-
             return;
         }
         
@@ -176,6 +166,7 @@ public class GameScreen : Scene
             
         }
 
+        //Todo give ppl lives or sthn :/
         if (ballRect.X < 0)
         {
             //Right point
@@ -212,85 +203,6 @@ public class GameScreen : Scene
             ballDir.X = 1;
         }
         ballDir.Y = new Random().Next(1) == 1 ? 1 : -1;
-        
-    }
-
-    class Paddle
-    {
-        private GameScreen _parent;
-        private Texture2D _sprite;
-        public Rectangle Rect;
-
-        private Keys _leftkey;
-        private Keys _rightkey;
-
-        private int _moveSpeed = 5;
-        public bool Axis;
-        
-
-        public Paddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, Keys left, Keys right, bool onXaxis = false)
-        {
-            _parent = parent;
-            Rect = new(pos.ToPoint(), size.ToPoint());
-            _sprite = sprite;
-            Axis = onXaxis;
-            _leftkey = left;
-            _rightkey = right;
-        }
-        
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(_sprite, Rect, Color.White);
-        }
-
-        public void Update(GameTime gameTime, GameWindow window)
-        {
-            //Check keydowns
-           
-            if (Keyboard.GetState().IsKeyDown(_leftkey))
-            {
-                if (!Axis)
-                {
-                    Rect.Y -= _moveSpeed;
-                }
-                else
-                {
-                    Rect.X += _moveSpeed;
-                }
-                    
-            }
-            
-            if (Keyboard.GetState().IsKeyDown(_rightkey))
-            {
-                if (!Axis)
-                {
-                    Rect.Y += _moveSpeed;
-                }
-                else
-                {
-                    Rect.X -= _moveSpeed;
-                }
-            }
-            //Constrain to playable space
-            if (Rect.Y < 0)
-            {
-                Rect.Y = 0;
-            }
-
-            if (Rect.Y + Rect.Height > window.ClientBounds.Height)
-            {
-                Rect.Y = window.ClientBounds.Height - Rect.Height;
-            }
-            
-            
-
-
-        }
-
-        void SetSpeed(int speed)
-        {
-            _moveSpeed = speed;
-        }
     }
 }
 
@@ -332,103 +244,3 @@ public class MenuScreen : Scene
             }
         }
     }
-
-public class UI
-{
-    private Button[] _buttons;
-
-    public UI(Button[] buttons)
-    {
-        _buttons = buttons;
-    }
-    public void Update(GameTime gameTime)
-    {
-        foreach (Button b in _buttons)
-        {
-            b.Update();
-        }
-    }
-
-    public void Draw(SpriteBatch spriteBatch)
-    {
-        foreach (Button b in _buttons)
-        {
-            b.Draw(spriteBatch);
-        }
-    }
-    public class Button
-    {
-        bool _buttonHover;
-        private bool _clicked;
-        private bool _buttonClickable = true;
-        private string _textureName;
-        Texture2D _buttonTexture;
-        Texture2D _highlightTexture;
-        MouseState _mousePrev = Mouse.GetState();
-        Point _position;
-        Point _size;
-        public event EventHandler ButtonDown;
-        
-        public Button(Vector2 positionV, Vector2 sizeV, Texture2D texture, Texture2D highlightTexture) : this(positionV,
-            sizeV, texture)
-        {
-
-            this._highlightTexture = highlightTexture;
-        }
-
-        public Button(Vector2 positionV, Vector2 sizeV, Texture2D texture)
-        {
-            this._position = positionV.ToPoint();
-            this._size = sizeV.ToPoint();
-            this._buttonTexture = texture;
-        }
-
-        public Button(Point position, Point size, Texture2D texture)
-        {
-            this._position = position;
-            this._size = size;
-            _buttonTexture = texture;
-        }
-
-        public void Load(Game game)
-        {
-            _buttonTexture = game.Content.Load<Texture2D>(_textureName);
-        }
-
-        public void Update()
-        {
-            CheckHover(Mouse.GetState().Position);
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && _mousePrev.LeftButton == ButtonState.Released && _buttonClickable && _buttonHover)
-            {
-                //Yay! button got clicked
-                ButtonDown?.Invoke(this, EventArgs.Empty);
-            }
-            _mousePrev = Mouse.GetState();
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(_buttonTexture, new Rectangle(_position, _size), Color.White);
-            if (_buttonHover && _highlightTexture != null)
-            {
-                spriteBatch.Draw(_highlightTexture, new Rectangle(_position, _size), Color.White);
-            }
-        }
-
-        bool CheckHover(Point mousePos)
-        {
-            if (mousePos.X > _position.X && mousePos.X < _position.X + _size.X && mousePos.Y > _position.Y &&
-                mousePos.Y < _position.Y + _size.Y)
-            {
-                //The mouse is on the button!!!
-                _buttonHover = true;
-            }
-            else
-            {
-                _buttonHover = false;
-            }
-
-            return _buttonHover;
-        }
-    }
-}
