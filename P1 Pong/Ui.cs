@@ -64,7 +64,7 @@ public class GameScreen : Scene
         _ballTex = _weede;
         
         _paddles = new Paddle[2];
-        _paddles[0] = new Paddle(
+        _paddles[0] = new PlayerPaddle(
             this,
             _paddleTex,
             new Vector2(20, _game.Window.ClientBounds.Height/2 - 100/2),
@@ -72,7 +72,7 @@ public class GameScreen : Scene
             Keys.W,
             Keys.S
             );
-        _paddles[1] = new Paddle(
+        _paddles[1] = new PlayerPaddle(
             this,
             _paddleTex,
             new Vector2(_game.Window.ClientBounds.Width - 20, _game.Window.ClientBounds.Height/2 - 100/2),
@@ -210,84 +210,6 @@ public class GameScreen : Scene
         }
         ballDir.Y = new Random().Next(1) == 1 ? 1 : -1;
         
-    }
-
-    class Paddle
-    {
-        private GameScreen _parent;
-        private Texture2D _sprite;
-        public Rectangle Rect;
-
-        private Keys _leftkey;
-        private Keys _rightkey;
-
-        private int _moveSpeed = 5;
-        public bool Axis;
-        
-
-        public Paddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, Keys left, Keys right, bool onXaxis = false)
-        {
-            _parent = parent;
-            Rect = new(pos.ToPoint(), size.ToPoint());
-            _sprite = sprite;
-            Axis = onXaxis;
-            _leftkey = left;
-            _rightkey = right;
-        }
-        
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(_sprite, Rect, Color.White);
-        }
-
-        public void Update(GameTime gameTime, GameWindow window)
-        {
-            //Check keydowns
-           
-            if (Keyboard.GetState().IsKeyDown(_leftkey))
-            {
-                if (!Axis)
-                {
-                    Rect.Y -= _moveSpeed;
-                }
-                else
-                {
-                    Rect.X += _moveSpeed;
-                }
-                    
-            }
-            
-            if (Keyboard.GetState().IsKeyDown(_rightkey))
-            {
-                if (!Axis)
-                {
-                    Rect.Y += _moveSpeed;
-                }
-                else
-                {
-                    Rect.X -= _moveSpeed;
-                }
-            }
-            //Constrain to playable space
-            if (Rect.Y < 0)
-            {
-                Rect.Y = 0;
-            }
-
-            if (Rect.Y + Rect.Height > window.ClientBounds.Height)
-            {
-                Rect.Y = window.ClientBounds.Height - Rect.Height;
-            }
-            
-            
-
-
-        }
-
-        void SetSpeed(int speed)
-        {
-            _moveSpeed = speed;
-        }
     }
 }
 
