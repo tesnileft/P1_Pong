@@ -68,7 +68,7 @@ public class GameScreen : Scene
             this,
             _paddleTex,
             new Vector2(20, _game.Window.ClientBounds.Height/2 - 100/2),
-            new Vector2(10, 50),
+            new Vector2(10, 100),
             Keys.W,
             Keys.S
             );
@@ -111,7 +111,7 @@ public class GameScreen : Scene
             if (coundownMs <= 0)
             {
                 _countdown = false;
-                coundownMs = 1000;
+                coundownMs = 3000;
                 RandomizeBall();
             }
 
@@ -142,6 +142,7 @@ public class GameScreen : Scene
                 Vector2 ballCenter = ballRect.Center.ToVector2();
                 Vector2 paddleCenter = p.Rect.Center.ToVector2();
                 
+                
                 // Normal (vertical paddle) is 0
                 double angleBall = p.Axis ? 1 : Math.Atan(  double.Abs(ballCenter.Y - paddleCenter.Y) / double.Abs(ballCenter.X - paddleCenter.X)) * 180 / Math.PI;
                 
@@ -161,6 +162,7 @@ public class GameScreen : Scene
                     //Side reflect
                     ballDir.Y *= (ballCenter.Y < paddleCenter.Y ? -1 : 1);
                     ballDir.X *= -1;
+                    //TODO get the ball out of the paddle
                 }
                 else
                 {
@@ -169,6 +171,7 @@ public class GameScreen : Scene
                     ballDir.Y = (float)(angleBall / 80) * (paddleCenter.Y> ballCenter.Y ? -1 : 1);
                     //Console.WriteLine($"Ball impact angle: {paddleCenter.Y > ballCenter.Y}");
                 }
+                
             }
             
         }
