@@ -31,6 +31,7 @@ public class Game1 : Game
     }
     protected override void Initialize()
     {
+        Window.Title = "Pong";
         base.Initialize();
     }
 
