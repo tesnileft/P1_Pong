@@ -60,7 +60,7 @@ public class GameScreen : Scene
         
         //2 player game
         //Temp textures
-        _paddleTex = _weede;
+        _paddleTex = Content.Load<Texture2D>("Paddle_default");
         _ballTex = _weede;
         
         _paddles = new Paddle[2];
@@ -68,7 +68,7 @@ public class GameScreen : Scene
             this,
             _paddleTex,
             new Vector2(20, _game.Window.ClientBounds.Height/2 - 100/2),
-            new Vector2(10, 50),
+            new Vector2(10, 100),
             Keys.W,
             Keys.S
             );
