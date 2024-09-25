@@ -9,8 +9,9 @@ public abstract class Paddle
     protected GameScreen _parent;
     protected Texture2D _sprite;
     public Rectangle Rect;
-    protected int _moveSpeed = 5;
+    protected int _moveSpeed = 8;
     public bool Axis;
+    
     public void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Draw(_sprite, Rect, Color.White);

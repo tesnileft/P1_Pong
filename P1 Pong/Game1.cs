@@ -38,21 +38,9 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        playButtonTex = Content.Load<Texture2D>(@"Sprites/UI/Play");
-        UI.Button[] buttons = new UI.Button[1];
-        buttons[0] = new UI.Button(
-            new Vector2(Window.ClientBounds.Width/2-50, 0) ,
-            new Vector2(100), 
-            playButtonTex,
-            Content.Load<Texture2D>(@"Sprites/UI/Highlight")
-            );
-        buttons[0].ButtonDown += (obj, args) =>
-        {
-            Console.WriteLine("Main menu button clicked");
-            currentScene = new GameScreen(this);
-            
-        };
-        menuScreen = new MenuScreen(buttons, Content.Load<Texture2D>(@"Sprites/UI/Highlight"));
+        //Initialize Menu UI
+        menuScreen = new MenuScreen(this);
+        
         currentScene = menuScreen;
     }
 
@@ -79,6 +67,12 @@ public class Game1 : Game
         _spriteBatch.End();
         
         base.Draw(gameTime);
+    }
+
+    //Grrr i need a scene manager >:/ (I do not need a scene manager)
+    public void ChangeScene(Scene scene)
+    {
+        currentScene = scene;
     }
 }
 

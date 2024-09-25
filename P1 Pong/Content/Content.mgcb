@@ -85,18 +85,6 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/UI/2P_sprite.png
 
-#begin Sprites/UI/2P_sprite.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/UI/2P_sprite.png
-
 #begin Sprites/UI/Git.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -109,7 +97,7 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/UI/Git.png
 
-#begin Sprites/UI/Git.png
+#begin Sprites/UI/Highlight_small.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -119,19 +107,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Sprites/UI/Git.png
-
-#begin Sprites/UI/Highlight.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/UI/Highlight.png
+/build:Sprites/UI/Highlight_small.png
 
 #begin Sprites/UI/Highlight.png
 /importer:TextureImporter
@@ -157,30 +133,6 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/UI/Play.png
 
-#begin Sprites/UI/Play.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/UI/Play.png
-
-#begin Sprites/UI/Settings.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/UI/Settings.png
-
 #begin Sprites/UI/Settings.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -205,18 +157,6 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/UI/Sound_off.png
 
-#begin Sprites/UI/Sound_off.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/UI/Sound_off.png
-
 #begin Sprites/UI/Sound_on.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -228,30 +168,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sprites/UI/Sound_on.png
-
-#begin Sprites/UI/Sound_on.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/UI/Sound_on.png
-
-#begin Sprites/UI/X.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/UI/X.png
 
 #begin Sprites/UI/X.png
 /importer:TextureImporter

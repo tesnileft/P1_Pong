@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -34,9 +36,11 @@ public class GameScreen : Scene
     private Texture2D _paddleTex;
     private Texture2D _weede;
     private bool _countdown = true;
-    private int coundownMs = 3000;
+    private int coundownMs = 1000;
     private Vector2 ballDir;
     private Rectangle ballRect;
+    private Paddle previousPaddle;
+    private Dictionary<Paddle, int> _scoreDict;
     
     Paddle[] _paddles;
 
@@ -74,6 +78,12 @@ public class GameScreen : Scene
             Keys.Up,
             Keys.Down
         );
+        _scoreDict = new ();
+        foreach (var paddle in _paddles)
+        {
+            //Start at 3 life
+            _scoreDict.Add(paddle, 3);
+        }
         int ballsize = 30;
         ballRect = new (new Point(_game.Window.ClientBounds.Width/2 -ballsize/2 ,_game.Window.ClientBounds.Height/2 - ballsize/2),new Point(ballsize));
         RandomizeBall();
@@ -102,7 +112,7 @@ public class GameScreen : Scene
             if (coundownMs <= 0)
             {
                 _countdown = false;
-                coundownMs = 3000;
+                coundownMs = 800;
                 RandomizeBall();
             }
             return;
@@ -125,7 +135,7 @@ public class GameScreen : Scene
         }
         foreach (Paddle p in _paddles)
         {
-            if (ballRect.Intersects(p.Rect))
+            if (ballRect.Intersects(p.Rect) && previousPaddle != p)
             {
                 //Do collision!!
                 //If it hits the top, should bounce back up, and invert x direction
@@ -152,7 +162,6 @@ public class GameScreen : Scene
                     //Side reflect
                     ballDir.Y *= (ballCenter.Y < paddleCenter.Y ? -1 : 1);
                     ballDir.X *= -1;
-                    //TODO get the ball out of the paddle
                 }
                 else
                 {
@@ -161,7 +170,7 @@ public class GameScreen : Scene
                     ballDir.Y = (float)(angleBall / 80) * (paddleCenter.Y> ballCenter.Y ? -1 : 1);
                     //Console.WriteLine($"Ball impact angle: {paddleCenter.Y > ballCenter.Y}");
                 }
-                
+                previousPaddle = p;
             }
             
         }
@@ -170,14 +179,14 @@ public class GameScreen : Scene
         if (ballRect.X < 0)
         {
             //Right point
-            
+            _scoreDict[_paddles[0]] -= 1;
             ResetBall();
         }
 
         if (ballRect.X + ballRect.Width > _game.Window.ClientBounds.Width)
         {
             //Left point
-            
+            _scoreDict[_paddles[1]] -= 1;
             ResetBall();
         }
         
@@ -189,6 +198,7 @@ public class GameScreen : Scene
         ballDir = Vector2.Zero;
         ballRect.Location = new Point(_game.Window.ClientBounds.Width / 2, _game.Window.ClientBounds.Height / 2);
         _countdown = true;
+        previousPaddle = null;
     }
 
     private void RandomizeBall()
@@ -218,10 +228,70 @@ public class MenuScreen : Scene
             _particles.Add(new CpuParticleManager(texture));
         }
 
-        public MenuScreen(UI.Button[] buttons, Texture2D tex)
+        public MenuScreen(Game1 Game)
         {
-            homeUI = new (buttons);
-            Init(tex);
+            ContentManager Content = Game.Content;
+            List<UI.Button> buttons = new List<UI.Button>();
+            int windowX = Game.Window.ClientBounds.Width;
+            int windowY = Game.Window.ClientBounds.Height;
+            
+            Texture2D twoPlayerSprite = Content.Load<Texture2D>("Sprites/UI/2P_sprite");
+            Texture2D highlightSpriteLarge = Content.Load<Texture2D>(@"Sprites/UI/Highlight");
+            UI.Button twopButton = new (
+                new Vector2(windowX/2-50, 200) ,
+                new Vector2(100), 
+                twoPlayerSprite,
+                highlightSpriteLarge
+                );
+            twopButton.ButtonDown += (obj, args) =>
+            {
+                Console.WriteLine("Main menu button clicked"); 
+                Game.ChangeScene(new GameScreen(Game));
+            
+            };
+            buttons.Add(twopButton);
+            
+            Texture2D highlightSpriteSmall = Content.Load<Texture2D>(@"Sprites/UI/Highlight_small");
+            Texture2D gitSprite = Content.Load<Texture2D>(@"Sprites/UI/Git");
+            UI.Button gitButton = new(
+                new Vector2(windowX - 40, windowY - 40), //Bottom right corner
+                new Vector2(40),
+                gitSprite,
+                highlightSpriteSmall
+            );
+            gitButton.ButtonDown += (sender, args) =>
+            {
+                string url = "https://github.com/tesnileft/P1_Pong";
+                try
+                {
+                    Process.Start(url);
+                }
+                catch
+                {
+                    // hack because of this: https://github.com/dotnet/corefx/issues/10361
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        url = url.Replace("&", "^&");
+                        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                    }
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        Process.Start("xdg-open", url);
+                    }
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    {
+                        Process.Start("open", url);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            };
+            buttons.Add(gitButton);
+            
+            homeUI = new (buttons.ToArray());
+            Init(highlightSpriteLarge);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
