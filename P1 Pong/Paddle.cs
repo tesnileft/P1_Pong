@@ -77,7 +77,6 @@ public class PlayerPaddle : Paddle
             Rect.Y = window.ClientBounds.Height - Rect.Height;
         }
     }
-    
 }
 
 public class AiPaddle : Paddle
@@ -96,5 +95,4 @@ public class AiPaddle : Paddle
         //Woo complex AI stuff wowowowowowowowowowow
         
     }
-    
 }

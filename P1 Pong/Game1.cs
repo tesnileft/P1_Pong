@@ -38,13 +38,13 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        playButtonTex = Content.Load<Texture2D>(@"Play");
+        playButtonTex = Content.Load<Texture2D>(@"Sprites/UI/Play");
         UI.Button[] buttons = new UI.Button[1];
         buttons[0] = new UI.Button(
             new Vector2(Window.ClientBounds.Width/2-50, 0) ,
             new Vector2(100), 
             playButtonTex,
-            Content.Load<Texture2D>(@"Highlight")
+            Content.Load<Texture2D>(@"Sprites/UI/Highlight")
             );
         buttons[0].ButtonDown += (obj, args) =>
         {
@@ -52,7 +52,7 @@ public class Game1 : Game
             currentScene = new GameScreen(this);
             
         };
-        menuScreen = new MenuScreen(buttons, Content.Load<Texture2D>(@"Highlight"));
+        menuScreen = new MenuScreen(buttons, Content.Load<Texture2D>(@"Sprites/UI/Highlight"));
         currentScene = menuScreen;
     }
 

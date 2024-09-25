@@ -50,10 +50,10 @@ public class GameScreen : Scene
     {
         //_ballTex = Content.Load<Texture2D>("Ball");
         //_paddleTex = Content.Load<Texture2D>("Paddle");
-        _weede = Content.Load<Texture2D>("Weede");
+        _weede = Content.Load<Texture2D>("Sprites/Weede");
         
         //For the 2 player game
-        _paddleTex = Content.Load<Texture2D>("Paddle_default");
+        _paddleTex = Content.Load<Texture2D>("Sprites/Paddle_default");
         //Temp texture
         _ballTex = _weede;
         
