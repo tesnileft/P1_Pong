@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace P1_Pong;
 
+
 public abstract class Paddle
 {
     protected GameScreen _parent;
@@ -11,10 +12,31 @@ public abstract class Paddle
     public Rectangle Rect;
     protected int _moveSpeed = 8;
     public bool Axis;
+    private UI.UI.TextElement _livesDisplay;
+    public int LifeCount = 3;
+    Color spriteColor = Color.White;
     
+    Vector2 lifeOffset = new (10,20);
+
+    protected Paddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, SpriteFont livesFont, bool onXaxis = false)
+    {
+        _parent = parent;
+        Rect = new(pos.ToPoint(), size.ToPoint());
+        this._sprite = sprite;
+        Axis = onXaxis;
+    
+        _livesDisplay = new(LifeCount.ToString(),livesFont, Rect);
+    }
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(_sprite, Rect, Color.White);
+        if (LifeCount == 0)
+        {
+            spriteColor = Color.Gray;
+        }
+        spriteBatch.Draw(_sprite, Rect, spriteColor);
+        _livesDisplay.Text = LifeCount.ToString();
+        _livesDisplay.Position = Rect.Location + lifeOffset.ToPoint();
+        _livesDisplay.Draw(spriteBatch);
     }
 
     public abstract void Update(GameTime gameTime, GameWindow window);
@@ -30,12 +52,8 @@ public class PlayerPaddle : Paddle
     private Keys _leftkey;
     private Keys _rightkey;
     
-    public PlayerPaddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, Keys left, Keys right, bool onXaxis = false)
+    public PlayerPaddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, Keys left, Keys right, SpriteFont livesFont, bool onXaxis = false) : base(parent, sprite, pos, size, livesFont, onXaxis)
     {
-        _parent = parent;
-        Rect = new(pos.ToPoint(), size.ToPoint());
-        _sprite = sprite;
-        Axis = onXaxis;
         _leftkey = left;
         _rightkey = right;
     }
@@ -82,12 +100,9 @@ public class PlayerPaddle : Paddle
 
 public class AiPaddle : Paddle
 {
-    public AiPaddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, bool onXaxis = false)
+    public AiPaddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, SpriteFont livesFont, bool onXaxis = false) : base(parent, sprite,  pos, size, livesFont, onXaxis)
     {
-        _parent = parent;
-        Rect = new(pos.ToPoint(), size.ToPoint());
-        _sprite = sprite;
-        Axis = onXaxis;
+        
         
     }
 

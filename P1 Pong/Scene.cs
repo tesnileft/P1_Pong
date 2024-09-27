@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using P1_Pong;
+using P1_Pong.UI;
 using TestLib.Helper;
 
 
@@ -38,9 +39,14 @@ public class GameScreen : Scene
     private bool _countdown = true;
     private int coundownMs = 1000;
     private Vector2 ballDir;
+    private Vector2 ballPos;
     private Rectangle ballRect;
     private Paddle previousPaddle;
     private Dictionary<Paddle, int> _scoreDict;
+
+    private UI _GameUi;
+    private UI _GameOverUi;
+    private UI _CurrentUi;
     
     Paddle[] _paddles;
 
@@ -61,6 +67,10 @@ public class GameScreen : Scene
         //Temp texture
         _ballTex = _weede;
         
+        SpriteFont font = Content.Load<SpriteFont>("Sprites/UI/SpriteFont");
+        
+        _CurrentUi = _GameUi;
+        
         _paddles = new Paddle[2];
         _paddles[0] = new PlayerPaddle(
             this,
@@ -68,7 +78,8 @@ public class GameScreen : Scene
             new Vector2(20, _game.Window.ClientBounds.Height/2 - 100/2),
             new Vector2(10, 100),
             Keys.W,
-            Keys.S
+            Keys.S,
+            font
             );
         _paddles[1] = new PlayerPaddle(
             this,
@@ -76,7 +87,8 @@ public class GameScreen : Scene
             new Vector2(_game.Window.ClientBounds.Width - 20, _game.Window.ClientBounds.Height/2 - 100/2),
             new Vector2(10, 100),
             Keys.Up,
-            Keys.Down
+            Keys.Down,
+            font
         );
         _scoreDict = new ();
         foreach (var paddle in _paddles)
@@ -85,6 +97,12 @@ public class GameScreen : Scene
             _scoreDict.Add(paddle, 3);
         }
         int ballsize = 30;
+        
+        
+        // Texture2D fontTexture = Content.Load<Texture2D>("Sprites/UI/1234Font");
+        
+        
+        
         ballRect = new (new Point(_game.Window.ClientBounds.Width/2 -ballsize/2 ,_game.Window.ClientBounds.Height/2 - ballsize/2),new Point(ballsize));
         RandomizeBall();
     }
@@ -103,6 +121,9 @@ public class GameScreen : Scene
         }
         //Draw ball 
         spriteBatch.Draw(_ballTex, ballRect, Color.White);
+        
+        //Draw UI
+        //_CurrentUi.Draw(spriteBatch);
     }
     public override void Update(GameTime gameTime)
     {
@@ -121,12 +142,18 @@ public class GameScreen : Scene
         //Paddle logic
         foreach (Paddle p in _paddles)
         {
-            p.Update(gameTime, _game.Window);
+            if (p.LifeCount > 0)
+            {
+                p.Update(gameTime, _game.Window);
+            }
+            
         }
         
         //Ball logic (2P)
         int ballspeed = gameTime.ElapsedGameTime.Milliseconds / 3;
-        ballRect.Location += (ballDir * ballspeed).ToPoint();
+        ballPos += (ballDir * ballspeed);
+        ballRect.Location = ballPos.ToPoint();
+        
         if (ballRect.Y < 0 || ballRect.Y + ballRect.Height > _game.Window.ClientBounds.Height)
         {
             //Invert Y direction bc we hit the top/bottom of the screen
@@ -174,19 +201,26 @@ public class GameScreen : Scene
             }
             
         }
-
-        //Todo give ppl lives or sthn :/
+        
         if (ballRect.X < 0)
         {
             //Right point
-            _scoreDict[_paddles[0]] -= 1;
+            _paddles[0].LifeCount -= 1;
+            if (_paddles[1].LifeCount <= 0)
+            {
+                //Gameover
+            }
             ResetBall();
         }
 
         if (ballRect.X + ballRect.Width > _game.Window.ClientBounds.Width)
         {
             //Left point
-            _scoreDict[_paddles[1]] -= 1;
+            _paddles[1].LifeCount -= 1;
+            if (_paddles[1].LifeCount <= 0)
+            {
+                //Gameover
+            }
             ResetBall();
         }
         
@@ -196,7 +230,8 @@ public class GameScreen : Scene
     private void ResetBall()
     {
         ballDir = Vector2.Zero;
-        ballRect.Location = new Point(_game.Window.ClientBounds.Width / 2, _game.Window.ClientBounds.Height / 2);
+        ballPos = new Vector2(_game.Window.ClientBounds.Width / 2, _game.Window.ClientBounds.Height / 2);
+        ballRect.Location = ballPos.ToPoint();
         _countdown = true;
         previousPaddle = null;
     }

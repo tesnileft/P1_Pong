@@ -3,32 +3,72 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace P1_Pong;
+namespace P1_Pong.UI;
 
 public class UI
 {
-    private Button[] _buttons;
+    private UiElement[] _elements;
 
-    public UI(Button[] buttons)
+    public UI(UiElement[] elements)
     {
-        _buttons = buttons;
+        _elements = elements;
     }
     public void Update(GameTime gameTime)
     {
-        foreach (Button b in _buttons)
+        foreach (UiElement b in _elements)
         {
-            b.Update();
+            b.Update(gameTime);
         }
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        foreach (Button b in _buttons)
+        foreach (UiElement b in _elements)
         {
             b.Draw(spriteBatch);
         }
     }
-    public class Button
+
+    public abstract class UiElement
+    {
+        public Point Position;
+        public Point Size;
+
+        void SetPos(Point newPosition)
+        {
+            Position = newPosition;
+        }
+        public abstract void Draw(SpriteBatch spriteBatch);
+        public abstract void Update(GameTime gameTime);
+    }
+
+    public class TextElement : UiElement
+    {
+        public string Text { get; set; }
+        public SpriteFont Font;
+
+        public TextElement(string text, SpriteFont font, Rectangle rect)
+        {
+            Text = text;
+            Font = font;
+            Size = rect.Size;
+            Position = rect.Location;
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            //
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.DrawString(Font, Text, Position.ToVector2(), Color.White);
+        }
+
+    }
+    
+
+    public class Button : UiElement
     {
         bool _buttonHover;
         private bool _clicked;
@@ -37,8 +77,7 @@ public class UI
         Texture2D _buttonTexture;
         Texture2D _highlightTexture;
         MouseState _mousePrev = Mouse.GetState();
-        Point _position;
-        Point _size;
+        
         public event EventHandler ButtonDown;
         
         public Button(Vector2 positionV, Vector2 sizeV, Texture2D texture, Texture2D highlightTexture) : this(positionV,
@@ -50,15 +89,15 @@ public class UI
 
         public Button(Vector2 positionV, Vector2 sizeV, Texture2D texture)
         {
-            this._position = positionV.ToPoint();
-            this._size = sizeV.ToPoint();
+            this.Position = positionV.ToPoint();
+            this.Size = sizeV.ToPoint();
             this._buttonTexture = texture;
         }
 
         public Button(Point position, Point size, Texture2D texture)
         {
-            this._position = position;
-            this._size = size;
+            this.Position = position;
+            this.Size = size;
             _buttonTexture = texture;
         }
 
@@ -67,7 +106,7 @@ public class UI
             _buttonTexture = game.Content.Load<Texture2D>(_textureName);
         }
 
-        public void Update()
+        public override void Update(GameTime gameTime)
         {
             CheckHover(Mouse.GetState().Position);
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && _mousePrev.LeftButton == ButtonState.Released && _buttonClickable && _buttonHover)
@@ -77,20 +116,19 @@ public class UI
             }
             _mousePrev = Mouse.GetState();
         }
-
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_buttonTexture, new Rectangle(_position, _size), Color.White);
+            spriteBatch.Draw(_buttonTexture, new Rectangle(Position, Size), Color.White);
             if (_buttonHover && _highlightTexture != null)
             {
-                spriteBatch.Draw(_highlightTexture, new Rectangle(_position, _size), Color.White);
+                spriteBatch.Draw(_highlightTexture, new Rectangle(Position, Size), Color.White);
             }
         }
 
         bool CheckHover(Point mousePos)
         {
-            if (mousePos.X > _position.X && mousePos.X < _position.X + _size.X && mousePos.Y > _position.Y &&
-                mousePos.Y < _position.Y + _size.Y)
+            if (mousePos.X > Position.X && mousePos.X < Position.X + Size.X && mousePos.Y > Position.Y &&
+                mousePos.Y < Position.Y + Size.Y)
             {
                 //The mouse is on the button!!!
                 _buttonHover = true;

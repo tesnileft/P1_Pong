@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-using Microsoft.Xna.Framework.Content;
-using TestLib.Helper;
 namespace P1_Pong;
 
 public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    private float backgroundhue = 0;    
     private Texture2D playButtonTex;
     private Scene menuScreen;
     private Scene gameScreen;
@@ -51,10 +45,6 @@ public class Game1 : Game
             Exit();
         
         currentScene.Update(gameTime);
-        
-        //This does nothing anymore 
-        backgroundhue = (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds) / 2 + 0.5f;
-        
         base.Update(gameTime);
     }
 
