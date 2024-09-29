@@ -78,6 +78,29 @@ namespace P1_Pong.UI
 
         }
 
+        public class ImageElement : UiElement
+        {
+            public Texture2D Texture;
+            
+
+            public ImageElement(Texture2D img, Rectangle rect)
+            {
+                Texture = img;
+                Size = rect.Size;
+                Position = rect.Location;
+            }
+
+            public override void Update(GameTime gameTime)
+            {
+                //does nothing
+            }
+
+            public override void Draw(SpriteBatch spriteBatch)
+            {
+                spriteBatch.Draw(Texture, new Rectangle(Position, Size), Color.White);
+            }
+        }
+
         /// <summary>
         /// Button. Handles being hovered over and can be subscribed to
         /// </summary>

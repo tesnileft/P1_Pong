@@ -268,7 +268,7 @@ public class GameScreen : Scene
         endGameElems.Add(exitButton);
         
         //Reset/try button
-        Texture2D retrySprite = Content.Load<Texture2D>("Sprites/UI/X");
+        Texture2D retrySprite = Content.Load<Texture2D>("Sprites/UI/Retry");
         Button retryButton = new(
             new Vector2(window.Width - 240, window.Height / 2 + 80), 
             new Vector2(40),

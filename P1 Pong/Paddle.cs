@@ -17,7 +17,7 @@ public abstract class Paddle
     protected Vector2 facingVec;
     public FacingDir Directional;
     private TextElement _livesDisplay;
-    public int LifeCount = 1;
+    public int LifeCount = 3;
     Color spriteColor = Color.White;
     public string Name = "player";
     

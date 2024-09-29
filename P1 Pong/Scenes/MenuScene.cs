@@ -24,15 +24,18 @@ public class MenuScreen : Scene
         public MenuScreen(PongGame Game)
         {
             ContentManager Content = Game.Content;
-            List<UiElement> buttons = new ();
+            List<UiElement> uiElements = new ();
             int windowX = Game.Window.ClientBounds.Width;
             int windowY = Game.Window.ClientBounds.Height;
             
+            Texture2D splash = Content.Load<Texture2D>("Sprites/UI/MenuSplash");
+            ImageElement splashImage = new ImageElement(splash, new Rectangle(150, 80, 500, 200));
+            uiElements.Add(splashImage);
             //2 Player start button
             Texture2D twoPlayerSprite = Content.Load<Texture2D>("Sprites/UI/2P_sprite");
             Texture2D highlightSpriteLarge = Content.Load<Texture2D>(@"Sprites/UI/Highlight");
             Button twopButton = new (
-                new Vector2(windowX/2-50, 200) ,
+                new Vector2(windowX/2-50, 400) ,
                 new Vector2(100), 
                 twoPlayerSprite,
                 highlightSpriteLarge
@@ -43,7 +46,7 @@ public class MenuScreen : Scene
                 Game.ChangeScene(new GameScreen(Game));
             
             };
-            buttons.Add(twopButton);
+            uiElements.Add(twopButton);
             
             //Git link button
             Texture2D highlightSpriteSmall = Content.Load<Texture2D>(@"Sprites/UI/Highlight_small");
@@ -83,7 +86,7 @@ public class MenuScreen : Scene
                     }
                 }
             };
-            buttons.Add(gitButton);
+            uiElements.Add(gitButton);
             
             //Exit button
             Texture2D exitSprite = Content.Load<Texture2D>(@"Sprites/UI/X");
@@ -97,7 +100,7 @@ public class MenuScreen : Scene
             {
                 Game.Exit(); //Bah bye!! -Famous plumber Mario Mario
             };
-            buttons.Add(exitButton);
+            uiElements.Add(exitButton);
             
             //Settings button
             Texture2D settingsSprite = Content.Load<Texture2D>(@"Sprites/UI/Settings");
@@ -111,9 +114,9 @@ public class MenuScreen : Scene
             {
                 Game.ChangeScene(new SettingsScene(Game));
             };
-            buttons.Add(settingsButton);
+            uiElements.Add(settingsButton);
             //And give everything to the UI to handle
-            homeUI = new (buttons.ToArray());
+            homeUI = new (uiElements.ToArray());
             //Silly particle emitter that follows your mouse, not at all important but cool
             InitParticles(highlightSpriteLarge);
         }
