@@ -176,6 +176,13 @@
 /processorParam:TextureFormat=Compressed
 /build:Sprites/UI/SpriteFont.spritefont
 
+#begin Sprites/UI/SpriteFontLarge.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Sprites/UI/SpriteFontLarge.spritefont
+
 #begin Sprites/UI/X.png
 /importer:TextureImporter
 /processor:TextureProcessor
