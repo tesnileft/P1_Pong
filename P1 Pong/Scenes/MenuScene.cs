@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using P1_Pong;
+using P1_Pong.Scenes;
 using P1_Pong.UI;
 using TestLib.Helper;
 
@@ -20,16 +21,17 @@ public class MenuScreen : Scene
             _particles.Add(new CpuParticleManager(texture));
         }
 
-        public MenuScreen(Game1 Game)
+        public MenuScreen(PongGame Game)
         {
             ContentManager Content = Game.Content;
-            List<UI.UiElement> buttons = new List<UI.UiElement>();
+            List<UiElement> buttons = new ();
             int windowX = Game.Window.ClientBounds.Width;
             int windowY = Game.Window.ClientBounds.Height;
+            
             //2 Player start button
             Texture2D twoPlayerSprite = Content.Load<Texture2D>("Sprites/UI/2P_sprite");
             Texture2D highlightSpriteLarge = Content.Load<Texture2D>(@"Sprites/UI/Highlight");
-            UI.Button twopButton = new (
+            Button twopButton = new (
                 new Vector2(windowX/2-50, 200) ,
                 new Vector2(100), 
                 twoPlayerSprite,
@@ -42,10 +44,11 @@ public class MenuScreen : Scene
             
             };
             buttons.Add(twopButton);
+            
             //Git link button
             Texture2D highlightSpriteSmall = Content.Load<Texture2D>(@"Sprites/UI/Highlight_small");
             Texture2D gitSprite = Content.Load<Texture2D>(@"Sprites/UI/Git");
-            UI.Button gitButton = new(
+            Button gitButton = new(
                 new Vector2(windowX - 40, windowY - 40), //Bottom right corner
                 new Vector2(40),
                 gitSprite,
@@ -81,9 +84,10 @@ public class MenuScreen : Scene
                 }
             };
             buttons.Add(gitButton);
+            
             //Exit button
             Texture2D exitSprite = Content.Load<Texture2D>(@"Sprites/UI/X");
-            UI.Button exitButton = new(
+            Button exitButton = new(
                 new Vector2(windowX - 40, 0), //Top right corner
                 new Vector2(40),
                 exitSprite,
@@ -95,7 +99,22 @@ public class MenuScreen : Scene
             };
             buttons.Add(exitButton);
             
+            //Settings button
+            Texture2D settingsSprite = Content.Load<Texture2D>(@"Sprites/UI/Settings");
+            Button settingsButton = new(
+                new Vector2(windowX - 120, windowY - 40), //Top right corner
+                new Vector2(40),
+                settingsSprite,
+                highlightSpriteSmall
+            );
+            settingsButton.ButtonDown += (sender, args) =>
+            {
+                Game.ChangeScene(new SettingsScene(Game));
+            };
+            buttons.Add(settingsButton);
+            //And give everything to the UI to handle
             homeUI = new (buttons.ToArray());
+            //Silly particle emitter that follows your mouse, not at all important but cool
             InitParticles(highlightSpriteLarge);
         }
 
