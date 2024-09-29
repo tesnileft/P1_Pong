@@ -279,7 +279,7 @@ public class GameScreen : Scene
         {
             _game.ChangeScene(new GameScreen(_game));
         };
-        endGameElems.Add(exitButton);
+        endGameElems.Add(retryButton);
         
         _CurrentUi = new UI(endGameElems.ToArray());
     }
