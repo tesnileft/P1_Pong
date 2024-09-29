@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace P1_Pong;
 
-public class Game1 : Game
+public class PongGame : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -16,7 +16,7 @@ public class Game1 : Game
     private MouseState mousePrev;
     private EventHandler mouseClick;
     
-    public Game1()
+    public PongGame()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
@@ -26,6 +26,10 @@ public class Game1 : Game
     protected override void Initialize()
     {
         Window.Title = "Pong";
+        Window.AllowUserResizing = false;
+        _graphics.PreferredBackBufferWidth = 800;
+        _graphics.PreferredBackBufferHeight = 800;
+        _graphics.ApplyChanges();
         base.Initialize();
     }
 

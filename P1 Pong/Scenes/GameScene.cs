@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,13 +10,13 @@ using P1_Pong.UI;
 public class GameScreen : Scene
 {
     readonly public ContentManager Content;
-    Game _game;
-
+    PongGame _game;
+    
     private Texture2D _ballTex;
     private Texture2D _paddleTex;
     private Texture2D _weede;
     private bool _countdown = true;
-    private int coundownMs = 1000;
+    private int _coundownMs = 1000;
     private Vector2 ballDir;
     private Vector2 ballPos;
     private Rectangle ballRect;
@@ -27,7 +28,7 @@ public class GameScreen : Scene
     
     Paddle[] _paddles;
 
-    public GameScreen(Game game)
+    public GameScreen(PongGame game)
     {
         Content = game.Content;
         _game = game;
@@ -35,45 +36,47 @@ public class GameScreen : Scene
     }
     public void LoadContent()
     {
-        //_ballTex = Content.Load<Texture2D>("Ball");
-        //_paddleTex = Content.Load<Texture2D>("Paddle");
+        //Load all required textures and UI
         _weede = Content.Load<Texture2D>("Sprites/Weede");
-        
-        //For the 2 player game
         _paddleTex = Content.Load<Texture2D>("Sprites/Paddle_default");
-        //Temp texture
-        _ballTex = _weede;
-        
+        _ballTex =  Content.Load<Texture2D>("Sprites/Ball");
         SpriteFont font = Content.Load<SpriteFont>("Sprites/UI/SpriteFont");
+        _CurrentUi = new UI(new UiElement[0]);
+        int paddleWidth = 16;
+        int paddleHeight = 160;
+        int borderDistance = 40;
         
-        _CurrentUi = new UI(new UI.UiElement[0]);
-        int paddleWidth = 10;
-        _paddles = new Paddle[2];
-        _paddles[0] = new PlayerPaddle(
-            "player 1",
-            this,
-            _paddleTex,
-            new Vector2(20, _game.Window.ClientBounds.Height/2 - 100/2),
-            new Vector2(paddleWidth, 100),
-            Keys.W,
-            Keys.S,
-            font
+        Load2P();
+        //For the 2 player game
+        void Load2P()
+        {
+            //Initialize the paddles
+            _paddles = new Paddle[2];
+            _paddles[0] = new PlayerPaddle(
+                "player 1",
+                this,
+                _paddleTex,
+                new Vector2(borderDistance, _game.Window.ClientBounds.Height/2 - 100/2),
+                new Vector2(paddleWidth, paddleHeight),
+                Keys.W,
+                Keys.S,
+                font,
+                Paddle.FacingDir.Right
             );
-        _paddles[1] = new PlayerPaddle(
-            "player 2",
-            this,
-            _paddleTex,
-            new Vector2(_game.Window.ClientBounds.Width - (20 + paddleWidth), _game.Window.ClientBounds.Height/2 - 100/2),
-            new Vector2(paddleWidth, 100),
-            Keys.Up,
-            Keys.Down,
-            font
-        );
-        int ballsize = 10;
-        
-        // Texture2D fontTexture = Content.Load<Texture2D>("Sprites/UI/1234Font");
-        
-        
+            _paddles[1] = new PlayerPaddle(
+                "player 2",
+                this,
+                _paddleTex,
+                new Vector2(_game.Window.ClientBounds.Width - (borderDistance + paddleWidth), _game.Window.ClientBounds.Height/2 - 100/2),
+                new Vector2(paddleWidth, paddleHeight),
+                Keys.Up,
+                Keys.Down,
+                font,
+                Paddle.FacingDir.Left
+            );
+        }
+        //Initialize the ball
+        int ballsize = 20;
         ballPos = new Vector2(_game.Window.ClientBounds.Width/2 -ballsize/2 ,_game.Window.ClientBounds.Height/2 - ballsize/2);
         ballRect = new (ballPos.ToPoint(), new Point(ballsize));
         RandomizeBall();
@@ -94,22 +97,25 @@ public class GameScreen : Scene
         //Draw ball 
         spriteBatch.Draw(_ballTex, ballRect, Color.White);
         
-        //Draw UI
+        //Draw the current UI
         _CurrentUi.Draw(spriteBatch);
     }
     public override void Update(GameTime gameTime)
     {
+        //Handle the little logic pause between ball respawning, just so you can breathe for a second
         if (_countdown)
         {
-            coundownMs -= gameTime.ElapsedGameTime.Milliseconds;
-            if (coundownMs <= 0)
+            _coundownMs -= gameTime.ElapsedGameTime.Milliseconds;
+            if (_coundownMs <= 0)
             {
                 _countdown = false;
-                coundownMs = 800;
+                _coundownMs = 800;
                 RandomizeBall();
             }
             return;
         }
+        
+        _CurrentUi.Update(gameTime);
         
         //Paddle logic
         foreach (Paddle p in _paddles)
@@ -143,7 +149,16 @@ public class GameScreen : Scene
                 
                 
                 // Normal (vertical paddle) is 0
-                double angleBall = p.Axis ? 1 : Math.Atan(  double.Abs(ballCenter.Y - paddleCenter.Y) / double.Abs(ballCenter.X - paddleCenter.X)) * 180 / Math.PI;
+                double angleBall;
+                if (p.Directional == Paddle.FacingDir.Left || p.Directional == Paddle.FacingDir.Right)
+                {
+                    angleBall = Math.Atan(double.Abs(ballCenter.Y - paddleCenter.Y) / double.Abs(ballCenter.X - paddleCenter.X)) * 180 / Math.PI;
+                }
+                else
+                {
+                    angleBall = 1;
+                }
+                
                 
                 double paddleX = Double.Abs(paddleCenter.X - p.Rect.Location.X);
                 double paddleY = Double.Abs(paddleCenter.Y - p.Rect.Location.Y);
@@ -178,9 +193,9 @@ public class GameScreen : Scene
         {
             //Right point
             _paddles[0].LifeCount -= 1;
-            if (_paddles[1].LifeCount <= 0)
+            if (_paddles[0].LifeCount <= 0)
             {
-                GameOver(_paddles[0].Name);
+                GameOver(_paddles[1].Name);
             }
             else
             {
@@ -195,26 +210,78 @@ public class GameScreen : Scene
             _paddles[1].LifeCount -= 1;
             if (_paddles[1].LifeCount <= 0)
             {
-                GameOver(_paddles[1].Name);
+                GameOver(_paddles[0].Name);
             }
             else
             {
                 ResetBall();
             }
         }
-        
-        
     }
 
     private void GameOver(string winPlayer)
     {
+        
         ballPos = new Vector2(_game.Window.ClientBounds.Width / 2, _game.Window.ClientBounds.Height / 2);
         ballDir = Vector2.Zero;
-        Rectangle gameOverMessageRect = new (Point.Zero, new Point(_game.Window.ClientBounds.Width, _game.Window.ClientBounds.Height));
+        
+        //End of game UI
+        Rectangle window = _game.Window.ClientBounds;
+        List<UiElement> endGameElems = new();
+        
+        //"win" text
         SpriteFont font = Content.Load<SpriteFont>("Sprites/UI/SpriteFontLarge");
-        UI.TextElement textGameOver = new($"{winPlayer} wins", font, gameOverMessageRect);
-        UI.UiElement[] endGameElems = { textGameOver };
-        _CurrentUi = new UI(endGameElems);
+        string wintext = $"{winPlayer} wins";
+        Rectangle gameOverMessageRect = new(
+            new Point(window.Width / 2 - (int)font.MeasureString(wintext).X / 2, window.Height / 2),
+            Point.Zero);
+        TextElement textGameOver = new(wintext, font, gameOverMessageRect);
+        endGameElems.Add(textGameOver);
+        
+        //Back home button
+        Texture2D homeSprite = Content.Load<Texture2D>("Sprites/UI/Home");
+        Texture2D highlightSpriteSmall = Content.Load<Texture2D>("Sprites/UI/Highlight_small");
+        Button goHomeButton = new(
+                new Vector2(200,  window.Height / 2), 
+                new Vector2(40),
+                homeSprite,
+                highlightSpriteSmall
+            );
+        goHomeButton.ButtonDown += (sender, args) =>
+        {
+            _game.ChangeScene(new MenuScreen(_game));
+        };
+        endGameElems.Add(goHomeButton);
+        
+        //Exit button
+        Texture2D exitSprite = Content.Load<Texture2D>("Sprites/UI/X");
+        Button exitButton = new(
+            new Vector2(window.Width - 240, window.Height / 2), 
+            new Vector2(40),
+            exitSprite,
+            highlightSpriteSmall
+        );
+        exitButton.ButtonDown += (sender, args) =>
+        {
+            _game.Exit();
+        };
+        endGameElems.Add(exitButton);
+        
+        //Reset/try button
+        Texture2D retrySprite = Content.Load<Texture2D>("Sprites/UI/X");
+        Button retryButton = new(
+            new Vector2(window.Width - 240, window.Height / 2 + 80), 
+            new Vector2(40),
+            retrySprite,
+            highlightSpriteSmall
+        );
+        retryButton.ButtonDown += (sender, args) =>
+        {
+            _game.ChangeScene(new GameScreen(_game));
+        };
+        endGameElems.Add(exitButton);
+        
+        _CurrentUi = new UI(endGameElems.ToArray());
     }
     private void ResetBall()
     {

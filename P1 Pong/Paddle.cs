@@ -1,7 +1,9 @@
+using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using TestLib.Helper;
 namespace P1_Pong;
 
 
@@ -11,19 +13,45 @@ public abstract class Paddle
     protected Texture2D _sprite;
     public Rectangle Rect;
     protected int _moveSpeed = 8;
-    public bool Axis;
-    private UI.UI.TextElement _livesDisplay;
-    public int LifeCount = 3;
-    Color spriteColor = Color.White;
-    
-    Vector2 lifeOffset = new (10,20);
 
-    protected Paddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, SpriteFont livesFont, bool onXaxis = false)
+    protected Vector2 facingVec;
+    public FacingDir Directional;
+    private TextElement _livesDisplay;
+    public int LifeCount = 1;
+    Color spriteColor = Color.White;
+    public string Name = "player";
+    
+    Vector2 lifeOffset = new (15,20);
+
+    public enum FacingDir
     {
+        Up = 1,
+        Right = 2,
+        Down = 3,
+        Left = 4
+    }
+    
+    protected Paddle(string name, GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, SpriteFont livesFont, FacingDir dir)
+    {
+        Name = name;
         _parent = parent;
         Rect = new(pos.ToPoint(), size.ToPoint());
         this._sprite = sprite;
-        Axis = onXaxis;
+        Directional = dir;
+        switch (Directional)
+        {
+            case FacingDir.Up:
+                lifeOffset = new(Rect.Width / 2, 15);
+                break;
+            case FacingDir.Right:
+                lifeOffset = new(-15, Rect.Height / 2);
+                break;
+            case FacingDir.Left:
+                lifeOffset = new(Rect.Width + 15, Rect.Height / 2);
+                break;
+        }
+            
+        
     
         _livesDisplay = new(LifeCount.ToString(),livesFont, Rect);
     }
@@ -52,7 +80,8 @@ public class PlayerPaddle : Paddle
     private Keys _leftkey;
     private Keys _rightkey;
     
-    public PlayerPaddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, Keys left, Keys right, SpriteFont livesFont, bool onXaxis = false) : base(parent, sprite, pos, size, livesFont, onXaxis)
+    public PlayerPaddle(string name, GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, Keys left, Keys right, SpriteFont livesFont, FacingDir facing) 
+        : base(name, parent, sprite, pos, size, livesFont, facing)
     {
         _leftkey = left;
         _rightkey = right;
@@ -60,47 +89,72 @@ public class PlayerPaddle : Paddle
     
     public override void Update(GameTime gameTime, GameWindow window)
     {
-        //Check keydowns
+        //Check keydowns and move the paddle
         if (Keyboard.GetState().IsKeyDown(_leftkey))
         {
-            if (!Axis)
+            switch (Directional)
             {
-                Rect.Y -= _moveSpeed;
-            }
-            else
-            {
-                Rect.X += _moveSpeed;
-            }
+                case FacingDir.Up:
                     
+                    break;
+                case FacingDir.Right:
+                    Rect.Y -= _moveSpeed;
+                    break;
+                case FacingDir.Down:
+                    
+                    break;
+                case FacingDir.Left:
+                    Rect.Y -= _moveSpeed;
+                    break;
+            }
         }
             
         if (Keyboard.GetState().IsKeyDown(_rightkey))
         {
-            if (!Axis)
+            switch (Directional)
             {
-                Rect.Y += _moveSpeed;
-            }
-            else
-            {
-                Rect.X -= _moveSpeed;
+                case FacingDir.Up:
+                    
+                    break;
+                case FacingDir.Right:
+                    Rect.Y += _moveSpeed;
+                    break;
+                case FacingDir.Down:
+                    
+                    break;
+                case FacingDir.Left:
+                    Rect.Y += _moveSpeed;
+                    break;
             }
         }
         //Constrain to playable space
-        if (Rect.Y < 0)
+        switch (Directional)
         {
-            Rect.Y = 0;
-        }
+            case FacingDir.Left:
+            case FacingDir.Right:
+                if (Rect.Y < 0)
+                {
+                    Rect.Y = 0;
+                }
 
-        if (Rect.Y + Rect.Height > window.ClientBounds.Height)
-        {
-            Rect.Y = window.ClientBounds.Height - Rect.Height;
+                if (Rect.Y + Rect.Height > window.ClientBounds.Height)
+                {
+                    Rect.Y = window.ClientBounds.Height - Rect.Height;
+                }
+                break;
+            case FacingDir.Down:
+            case FacingDir.Up:
+                    //TODO constrain left/right movement
+                break;
         }
+        
     }
 }
 
 public class AiPaddle : Paddle
 {
-    public AiPaddle(GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, SpriteFont livesFont, bool onXaxis = false) : base(parent, sprite,  pos, size, livesFont, onXaxis)
+    public AiPaddle(string name, GameScreen parent, Texture2D sprite, Vector2 pos, Vector2 size, SpriteFont livesFont,
+        FacingDir dir) : base(name, parent, sprite,  pos, size, livesFont, dir)
     {
         
         
